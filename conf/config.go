@@ -104,7 +104,7 @@ func newDefaultLog() *log {
 func newDefaultMongoDB() *mongodb {
 	return &mongodb{
 		Database:  "",
-		Endpoints: []string{"127.0.0.1:27017"},
+		Endpoints: []string{"47.111.3.9:27017"},
 	}
 }
 
