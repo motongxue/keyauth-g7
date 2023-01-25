@@ -12,7 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Save Object
 func (s *service) save(ctx context.Context, ins *book.Book) error {
+	// s.col.InsertMany()
 	if _, err := s.col.InsertOne(ctx, ins); err != nil {
 		return exception.NewInternalServerError("inserted book(%s) document error, %s",
 			ins.Data.Name, err)
@@ -20,6 +22,9 @@ func (s *service) save(ctx context.Context, ins *book.Book) error {
 	return nil
 }
 
+// GET, Describe
+// filter 过滤器(Collection),类似于MYSQL Where条件
+// 调用Decode方法来进行 反序列化  bytes ---> Object (通过BSON Tag)
 func (s *service) get(ctx context.Context, id string) (*book.Book, error) {
 	filter := bson.M{"_id": id}
 
@@ -41,18 +46,22 @@ func newQueryBookRequest(r *book.QueryBookRequest) *queryBookRequest {
 	}
 }
 
+// 把QueryReq --> MongoDB Options
 type queryBookRequest struct {
 	*book.QueryBookRequest
 }
 
+// Find参数
 func (r *queryBookRequest) FindOptions() *options.FindOptions {
 	pageSize := int64(r.Page.PageSize)
 	skip := int64(r.Page.PageSize) * int64(r.Page.PageNumber-1)
 
 	opt := &options.FindOptions{
+		// 排序: Order By create_at Desc
 		Sort: bson.D{
 			{Key: "create_at", Value: -1},
 		},
+		// 分页: limit 0,10  skip:0, limit:10
 		Limit: &pageSize,
 		Skip:  &skip,
 	}
@@ -60,6 +69,8 @@ func (r *queryBookRequest) FindOptions() *options.FindOptions {
 	return opt
 }
 
+// 过滤条件
+// 由于Mongodb支持嵌套, JSON, 如何过滤嵌套里面的条件, 使用.访问嵌套对象属性
 func (r *queryBookRequest) FindFilter() bson.M {
 	filter := bson.M{}
 	if r.Keywords != "" {
@@ -71,6 +82,8 @@ func (r *queryBookRequest) FindFilter() bson.M {
 	return filter
 }
 
+// LIST, Query, 会很多条件(分页, 关键字, 条件过滤, 排序)
+// 需要单独为其 做过滤参数构建
 func (s *service) query(ctx context.Context, req *queryBookRequest) (*book.BookSet, error) {
 	resp, err := s.col.Find(ctx, req.FindFilter(), req.FindOptions())
 
@@ -99,7 +112,10 @@ func (s *service) query(ctx context.Context, req *queryBookRequest) (*book.BookS
 	return set, nil
 }
 
+// UpdateByID, 通过主键来更新对象
 func (s *service) update(ctx context.Context, ins *book.Book) error {
+	// SQL update obj(SET f=v,f=v) where id=?
+	// s.col.UpdateOne(ctx, filter(), ins)
 	if _, err := s.col.UpdateByID(ctx, ins.Id, ins); err != nil {
 		return exception.NewInternalServerError("inserted book(%s) document error, %s",
 			ins.Data.Name, err)

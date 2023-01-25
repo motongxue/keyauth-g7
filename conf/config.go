@@ -132,6 +132,8 @@ func (m *mongodb) Client() (*mongo.Client, error) {
 	return mgoclient, nil
 }
 
+// 专门制定要访问的数据库
+// 这里要访问的DB 就是我们认证的DB
 func (m *mongodb) GetDB() (*mongo.Database, error) {
 	conn, err := m.Client()
 	if err != nil {
@@ -142,26 +144,28 @@ func (m *mongodb) GetDB() (*mongo.Database, error) {
 
 func (m *mongodb) getClient() (*mongo.Client, error) {
 	opts := options.Client()
-
+	// AuthSource 代表认证数据库, mongodb的用户是针对db
+	// 对应认证用户和对应库 一起创建
 	cred := options.Credential{
 		AuthSource: m.Database,
 	}
-
+	// 使用Password认证
 	if m.UserName != "" && m.Password != "" {
 		cred.Username = m.UserName
 		cred.Password = m.Password
 		cred.PasswordSet = true
 		opts.SetAuth(cred)
 	}
+	// MongoDB 地址
 	opts.SetHosts(m.Endpoints)
 	opts.SetConnectTimeout(5 * time.Second)
 
-	// Connect to MongoDB
+	// Connect to MongoDB, 惰性连接
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
 		return nil, fmt.Errorf("new mongodb client error, %s", err)
 	}
-
+	// 保证当前Mongodb服务是在线
 	if err = client.Ping(context.TODO(), nil); err != nil {
 		return nil, fmt.Errorf("ping mongodb server(%s) error, %s", m.Endpoints, err)
 	}
