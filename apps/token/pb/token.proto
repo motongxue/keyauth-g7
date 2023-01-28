@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package keyauth_g7.token;
+option go_package = "github.com/motongxue/keyauth-g7/apps/token";
+
+import "github.com/infraboard/mcube/pb/page/page.proto";
+import "github.com/infraboard/mcube/pb/request/request.proto";
+
+service Service {
+    rpc IssueToken(IssueTokenRequest) returns(Token);
+    rpc QueryToken(QueryTokenRequest) returns(TokenSet);
+    rpc DescribeToken(DescribeTokenRequest) returns(Token);
+    rpc UpdateToken(UpdateTokenRequest) returns(Token);
+    rpc DeleteToken(DeleteTokenRequest) returns(Token);
+}
+
+message Token {
+    // 唯一的ID
+    // @gotags: json: "access_token" bson: "_id"
+    string access_token = 1;
+    // 颁发时间
+    // @gotags: json:"issue_at" bson:"issue_at"
+    int64 issue_at = 2;
+    // 更新时间
+    // @gotags: json:"update_at" bson:"update_at"
+    int64 update_at = 3;
+    // 更新人
+    // @gotags: json:"update_by" bson:"update_by"
+    string update_by = 4;
+    // 颁发请求
+    // @gotags: json:"data" bson:"data"
+    IssueTokenRequest data = 5;
+    // Access Token过期时间(绝对时间), 10分钟,  now() + 10分钟
+    // @gotags: json:"access_token_expired_at" bson:"access_token_expired_at"
+    int64 access_token_expired_at = 6;
+    // token过期了, 允许刷新
+    // @gotags: json:"refresh_token" bson:"refresh_token"
+    string refresh_token = 7;
+    // Access Token过期时间(绝对时间), 10分钟,  now() + 10分钟
+    // @gotags: json:"refresh_token_expired_at" bson:"refresh_token_expired_at"
+    int64 refresh_token_expired_at = 8;
+}
+message TokenSet {
+    // 分页时，当前页的总数量
+    // @gotags: json: "total"
+    int64 total = 1;
+    // 一页中的数据
+    // @gotags: json: "items"
+    repeated Token items = 2;
+}
+// 授权的类型
+enum GrantedType {
+    // 通过Paasword授权
+    PASSWORD = 0;
+    // LDAP认证
+    LADP = 1;
+    // 通过ACCESS TOKEN来获取一个 TK, 用户API用户访问(RESTful SDK)
+    // 通过一个User Password的Token 来生成一个 ACCESS TOKEN
+    // HTTP API 编程访问
+    ACCESS_TOKEN = 2;
+    // 通过REFRESH TOKEN获取令牌
+    REFRSH_TOKEN = 3;
+}
+
+message IssueTokenRequest {
+    // 授权类型
+    // @gotags: json: "granted_type" bson: "granted_type"
+    GrantedType granted_type = 1;
+    // 用户名
+    // @gotags: json: "user_name" bson: "user_name"
+    string user_name = 2;
+    // 密码
+    // @gotags: json: "password" bson: "_"
+    string password = 3;
+}
+message QueryTokenRequest {
+    // 分页参数
+    // @gotags: json:"page"
+    infraboard.mcube.page.PageRequest page = 1;
+    // 关键字参数
+    // @gotags: json:"keywords"
+    string keywords = 2;
+}
+message DescribeTokenRequest {
+    // book id
+    // @gotags: json: "id"
+    string id = 1;
+}
+message UpdateTokenRequest {
+    // book id
+    // @gotags: json:"id"
+    string id = 1;
+    // 更新模式
+    // @gotags: json:"update_mode"
+    infraboard.mcube.request.UpdateMode update_mode = 2;
+    // 更新人
+    // @gotags: json:"update_by"
+    string update_by = 3;
+    // 更新时间
+    // @gotags: json:"update_at"
+    int64 update_at = 4;
+    // 更新的书本信息
+    // @gotags: json:"data"
+    IssueTokenRequest data = 5;
+}
+message DeleteTokenRequest {
+    // book id
+    // @gotags: json:"id"
+    string id = 1;
+}
