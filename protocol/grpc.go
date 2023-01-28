@@ -13,7 +13,7 @@ import (
 	"github.com/motongxue/keyauth-g7/conf"
 )
 
-// NewGRPCService todo
+// NewGRPCService
 func NewGRPCService() *GRPCService {
 	log := zap.L().Named("GRPC Service")
 
