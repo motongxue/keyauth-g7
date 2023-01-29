@@ -51,6 +51,7 @@ message Token {
     // @gotags: json:"meta" bson:"meta"
     map<string, string> meta = 10;
 }
+
 message TokenSet {
     // 分页时，当前页的总数量
     // @gotags: json: "total"
@@ -59,6 +60,7 @@ message TokenSet {
     // @gotags: json: "items"
     repeated Token items = 2;
 }
+
 // 授权的类型
 enum GrantedType {
     // 通过Paasword授权
@@ -87,6 +89,7 @@ message IssueTokenRequest {
     // @gotags: json: "password" bson: "_"
     string password = 4;
 }
+
 message QueryTokenRequest {
     // 分页参数
     // @gotags: json:"page"
@@ -95,11 +98,13 @@ message QueryTokenRequest {
     // @gotags: json:"keywords"
     string keywords = 2;
 }
+
 //message DescribeTokenRequest {
 //    // book id
 //    // @gotags: json: "id"
 //    string id = 1;
 //}
+
 //message UpdateTokenRequest {
 //    // book id
 //    // @gotags: json:"id"
@@ -117,21 +122,30 @@ message QueryTokenRequest {
 //    // @gotags: json:"data"
 //    IssueTokenRequest data = 5;
 //}
+
 //message DeleteTokenRequest {
 //    // book id
 //    // @gotags: json:"id"
 //    string id = 1;
 //}
+
 message ValidateTokenRequest {
     // access token
     // @gotags: json:"access_token"
     string access_token = 1;
 }
+
 message RevolkTokenRequest {
     // access token
     // @gotags: json:"access_token"
     string access_token = 1;
     // refresh token, 当做撤销凭证
-    // @gotags: json:"access_token"
+    // @gotags: json:"refresh_token"
     string refresh_token = 2;
+}
+
+message DescribeTokenRequest {
+    // access token
+    // @gotags: json:"access_token"
+    string access_token = 1;
 }

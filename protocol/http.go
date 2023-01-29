@@ -60,6 +60,7 @@ type HTTPService struct {
 	server *http.Server
 }
 
+// 在此处添加对应的AppName前缀
 func (s *HTTPService) PathPrefix() string {
 	return fmt.Sprintf("/%s/api", s.c.App.Name)
 }
