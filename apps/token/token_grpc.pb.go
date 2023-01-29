@@ -22,11 +22,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ServiceClient interface {
+	// 颁发Token(Login)
 	IssueToken(ctx context.Context, in *IssueTokenRequest, opts ...grpc.CallOption) (*Token, error)
+	// 撤销Token(Logout)
+	RevolkToken(ctx context.Context, in *RevolkTokenRequest, opts ...grpc.CallOption) (*Token, error)
+	// 校验Token的接口(内部服务使用)
+	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*Token, error)
+	// 查询Token, 查询用于REST ful API访问颁发出去的Token
 	QueryToken(ctx context.Context, in *QueryTokenRequest, opts ...grpc.CallOption) (*TokenSet, error)
-	DescribeToken(ctx context.Context, in *DescribeTokenRequest, opts ...grpc.CallOption) (*Token, error)
-	UpdateToken(ctx context.Context, in *UpdateTokenRequest, opts ...grpc.CallOption) (*Token, error)
-	DeleteToken(ctx context.Context, in *DeleteTokenRequest, opts ...grpc.CallOption) (*Token, error)
 }
 
 type serviceClient struct {
@@ -46,36 +49,27 @@ func (c *serviceClient) IssueToken(ctx context.Context, in *IssueTokenRequest, o
 	return out, nil
 }
 
+func (c *serviceClient) RevolkToken(ctx context.Context, in *RevolkTokenRequest, opts ...grpc.CallOption) (*Token, error) {
+	out := new(Token)
+	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/RevolkToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*Token, error) {
+	out := new(Token)
+	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/ValidateToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serviceClient) QueryToken(ctx context.Context, in *QueryTokenRequest, opts ...grpc.CallOption) (*TokenSet, error) {
 	out := new(TokenSet)
 	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/QueryToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *serviceClient) DescribeToken(ctx context.Context, in *DescribeTokenRequest, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/DescribeToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *serviceClient) UpdateToken(ctx context.Context, in *UpdateTokenRequest, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/UpdateToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *serviceClient) DeleteToken(ctx context.Context, in *DeleteTokenRequest, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/keyauth_g7.token.Service/DeleteToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,11 +80,14 @@ func (c *serviceClient) DeleteToken(ctx context.Context, in *DeleteTokenRequest,
 // All implementations must embed UnimplementedServiceServer
 // for forward compatibility
 type ServiceServer interface {
+	// 颁发Token(Login)
 	IssueToken(context.Context, *IssueTokenRequest) (*Token, error)
+	// 撤销Token(Logout)
+	RevolkToken(context.Context, *RevolkTokenRequest) (*Token, error)
+	// 校验Token的接口(内部服务使用)
+	ValidateToken(context.Context, *ValidateTokenRequest) (*Token, error)
+	// 查询Token, 查询用于REST ful API访问颁发出去的Token
 	QueryToken(context.Context, *QueryTokenRequest) (*TokenSet, error)
-	DescribeToken(context.Context, *DescribeTokenRequest) (*Token, error)
-	UpdateToken(context.Context, *UpdateTokenRequest) (*Token, error)
-	DeleteToken(context.Context, *DeleteTokenRequest) (*Token, error)
 	mustEmbedUnimplementedServiceServer()
 }
 
@@ -101,17 +98,14 @@ type UnimplementedServiceServer struct {
 func (UnimplementedServiceServer) IssueToken(context.Context, *IssueTokenRequest) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IssueToken not implemented")
 }
+func (UnimplementedServiceServer) RevolkToken(context.Context, *RevolkTokenRequest) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevolkToken not implemented")
+}
+func (UnimplementedServiceServer) ValidateToken(context.Context, *ValidateTokenRequest) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
+}
 func (UnimplementedServiceServer) QueryToken(context.Context, *QueryTokenRequest) (*TokenSet, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryToken not implemented")
-}
-func (UnimplementedServiceServer) DescribeToken(context.Context, *DescribeTokenRequest) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DescribeToken not implemented")
-}
-func (UnimplementedServiceServer) UpdateToken(context.Context, *UpdateTokenRequest) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateToken not implemented")
-}
-func (UnimplementedServiceServer) DeleteToken(context.Context, *DeleteTokenRequest) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteToken not implemented")
 }
 func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
 
@@ -144,6 +138,42 @@ func _Service_IssueToken_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Service_RevolkToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevolkTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).RevolkToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/keyauth_g7.token.Service/RevolkToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).RevolkToken(ctx, req.(*RevolkTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Service_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServer).ValidateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/keyauth_g7.token.Service/ValidateToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServer).ValidateToken(ctx, req.(*ValidateTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Service_QueryToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryTokenRequest)
 	if err := dec(in); err != nil {
@@ -162,60 +192,6 @@ func _Service_QueryToken_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_DescribeToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DescribeTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ServiceServer).DescribeToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/keyauth_g7.token.Service/DescribeToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).DescribeToken(ctx, req.(*DescribeTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Service_UpdateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ServiceServer).UpdateToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/keyauth_g7.token.Service/UpdateToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).UpdateToken(ctx, req.(*UpdateTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Service_DeleteToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ServiceServer).DeleteToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/keyauth_g7.token.Service/DeleteToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).DeleteToken(ctx, req.(*DeleteTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Service_ServiceDesc is the grpc.ServiceDesc for Service service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,20 +204,16 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Service_IssueToken_Handler,
 		},
 		{
+			MethodName: "RevolkToken",
+			Handler:    _Service_RevolkToken_Handler,
+		},
+		{
+			MethodName: "ValidateToken",
+			Handler:    _Service_ValidateToken_Handler,
+		},
+		{
 			MethodName: "QueryToken",
 			Handler:    _Service_QueryToken_Handler,
-		},
-		{
-			MethodName: "DescribeToken",
-			Handler:    _Service_DescribeToken_Handler,
-		},
-		{
-			MethodName: "UpdateToken",
-			Handler:    _Service_UpdateToken_Handler,
-		},
-		{
-			MethodName: "DeleteToken",
-			Handler:    _Service_DeleteToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

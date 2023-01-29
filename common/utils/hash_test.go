@@ -1,7 +1,7 @@
 package utils_test
 
 import (
-	"github.com/motongxue/keyauth-g7/utils"
+	"github.com/motongxue/keyauth-g7/common/utils"
 	"testing"
 )
 

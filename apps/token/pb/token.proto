@@ -4,14 +4,22 @@ package keyauth_g7.token;
 option go_package = "github.com/motongxue/keyauth-g7/apps/token";
 
 import "github.com/infraboard/mcube/pb/page/page.proto";
-import "github.com/infraboard/mcube/pb/request/request.proto";
+//import "github.com/infraboard/mcube/pb/request/request.proto";
 
 service Service {
+    // 颁发Token(Login)
     rpc IssueToken(IssueTokenRequest) returns(Token);
+    // 撤销Token(Logout)
+    rpc RevolkToken(RevolkTokenRequest) returns(Token);
+    
+    // 校验Token的接口(内部服务使用)
+    rpc ValidateToken(ValidateTokenRequest) returns(Token);
+    
+    // 查询Token, 查询用于REST ful API访问颁发出去的Token
     rpc QueryToken(QueryTokenRequest) returns(TokenSet);
-    rpc DescribeToken(DescribeTokenRequest) returns(Token);
-    rpc UpdateToken(UpdateTokenRequest) returns(Token);
-    rpc DeleteToken(DeleteTokenRequest) returns(Token);
+    //    rpc DescribeToken(DescribeTokenRequest) returns(Token);
+    //    rpc UpdateToken(UpdateTokenRequest) returns(Token);
+    //    rpc DeleteToken(DeleteTokenRequest) returns(Token);
 }
 
 message Token {
@@ -39,6 +47,9 @@ message Token {
     // Access Token过期时间(绝对时间), 10分钟,  now() + 10分钟
     // @gotags: json:"refresh_token_expired_at" bson:"refresh_token_expired_at"
     int64 refresh_token_expired_at = 8;
+    // 用于传递额外信息
+    // @gotags: json:"meta" bson:"meta"
+    map<string, string> meta = 10;
 }
 message TokenSet {
     // 分页时，当前页的总数量
@@ -66,12 +77,15 @@ message IssueTokenRequest {
     // 授权类型
     // @gotags: json: "granted_type" bson: "granted_type"
     GrantedType granted_type = 1;
+    // 域
+    // @gotags: json:"domain" bson:"domain"
+    string user_domain = 2;
     // 用户名
     // @gotags: json: "user_name" bson: "user_name"
-    string user_name = 2;
+    string user_name = 3;
     // 密码
     // @gotags: json: "password" bson: "_"
-    string password = 3;
+    string password = 4;
 }
 message QueryTokenRequest {
     // 分页参数
@@ -81,30 +95,43 @@ message QueryTokenRequest {
     // @gotags: json:"keywords"
     string keywords = 2;
 }
-message DescribeTokenRequest {
-    // book id
-    // @gotags: json: "id"
-    string id = 1;
+//message DescribeTokenRequest {
+//    // book id
+//    // @gotags: json: "id"
+//    string id = 1;
+//}
+//message UpdateTokenRequest {
+//    // book id
+//    // @gotags: json:"id"
+//    string id = 1;
+//    // 更新模式
+//    // @gotags: json:"update_mode"
+//    infraboard.mcube.request.UpdateMode update_mode = 2;
+//    // 更新人
+//    // @gotags: json:"update_by"
+//    string update_by = 3;
+//    // 更新时间
+//    // @gotags: json:"update_at"
+//    int64 update_at = 4;
+//    // 更新的书本信息
+//    // @gotags: json:"data"
+//    IssueTokenRequest data = 5;
+//}
+//message DeleteTokenRequest {
+//    // book id
+//    // @gotags: json:"id"
+//    string id = 1;
+//}
+message ValidateTokenRequest {
+    // access token
+    // @gotags: json:"access_token"
+    string access_token = 1;
 }
-message UpdateTokenRequest {
-    // book id
-    // @gotags: json:"id"
-    string id = 1;
-    // 更新模式
-    // @gotags: json:"update_mode"
-    infraboard.mcube.request.UpdateMode update_mode = 2;
-    // 更新人
-    // @gotags: json:"update_by"
-    string update_by = 3;
-    // 更新时间
-    // @gotags: json:"update_at"
-    int64 update_at = 4;
-    // 更新的书本信息
-    // @gotags: json:"data"
-    IssueTokenRequest data = 5;
-}
-message DeleteTokenRequest {
-    // book id
-    // @gotags: json:"id"
-    string id = 1;
+message RevolkTokenRequest {
+    // access token
+    // @gotags: json:"access_token"
+    string access_token = 1;
+    // refresh token, 当做撤销凭证
+    // @gotags: json:"access_token"
+    string refresh_token = 2;
 }

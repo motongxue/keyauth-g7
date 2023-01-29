@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/infraboard/mcube/exception"
 	"github.com/motongxue/keyauth-g7/apps/user"
-	"github.com/motongxue/keyauth-g7/utils"
+	"github.com/motongxue/keyauth-g7/common/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -28,7 +28,7 @@ func (i *impl) QueryUser(ctx context.Context, req *user.QueryUserRequest) (*user
 	return i.query(ctx, query)
 }
 func (i *impl) DescribeUser(ctx context.Context, req *user.DescribeUserRequest) (*user.User, error) {
-	return i.get(ctx, req.Id)
+	return i.get(ctx, req)
 }
 func (i *impl) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")

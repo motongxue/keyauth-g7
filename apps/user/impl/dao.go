@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"github.com/infraboard/mcube/exception"
 	"github.com/motongxue/keyauth-g7/apps/user"
 	"go.mongodb.org/mongo-driver/bson"
@@ -76,16 +77,24 @@ func (i *impl) query(ctx context.Context, req *queryRequest) (*user.UserSet, err
 // GET, Describe
 // filter 过滤器(Collection),类似于MYSQL Where条件
 // 调用Decode方法来进行 反序列化  bytes ---> Object (通过BSON Tag)
-func (i *impl) get(ctx context.Context, id string) (*user.User, error) {
-	filter := bson.M{"_id": id}
-
+func (i *impl) get(ctx context.Context, req *user.DescribeUserRequest) (*user.User, error) {
+	filter := bson.M{}
+	switch req.DescribeBy {
+	case user.DescribeBy_USER_ID:
+		filter["_id"] = req.UserId
+	case user.DescribeBy_USER_NAME:
+		filter["data.domain"] = req.Domain
+		filter["data.name"] = req.UserName
+	default:
+		return nil, fmt.Errorf("unknow describe_by %s", req.DescribeBy)
+	}
 	ins := user.NewDefaultUser()
 	if err := i.col.FindOne(ctx, filter).Decode(ins); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, exception.NewNotFound("user %s not found", id)
+			return nil, exception.NewNotFound("user %s not found", req)
 		}
 
-		return nil, exception.NewInternalServerError("find user %s error, %s", id, err)
+		return nil, exception.NewInternalServerError("find user %s error, %s", req, err)
 	}
 
 	return ins, nil

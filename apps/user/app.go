@@ -4,14 +4,15 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/infraboard/mcube/http/request"
 	pb_request "github.com/infraboard/mcube/pb/request"
-	"github.com/motongxue/keyauth-g7/utils"
+	"github.com/motongxue/keyauth-g7/common/utils"
 	"github.com/rs/xid"
 	"net/http"
 	"time"
 )
 
 const (
-	AppName = "user"
+	AppName       = "user"
+	DefaultDomain = "default"
 )
 
 var (
@@ -34,8 +35,8 @@ func (req *CreateUserRequest) Validate() error {
 	return validate.Struct(req)
 }
 
-func (u *User) CheckPassword(password string) {
-	utils.CheckPasswordHash(password, u.Data.Password)
+func (u *User) CheckPassword(password string) bool {
+	return utils.CheckPasswordHash(password, u.Data.Password)
 }
 
 func NewUserSet() *UserSet {
@@ -48,7 +49,7 @@ func (s UserSet) Add(item *User) {
 }
 func NewCreateUserRequest() *CreateUserRequest {
 	return &CreateUserRequest{
-		Domain: "default",
+		Domain: DefaultDomain,
 	}
 }
 func NewQueryUserRequestFromHTTP(r *http.Request) *QueryUserRequest {
@@ -59,9 +60,18 @@ func NewQueryUserRequestFromHTTP(r *http.Request) *QueryUserRequest {
 	}
 }
 
-func NewDescribeUserRequest(id string) *DescribeUserRequest {
+func NewDescribeUserRequestById(id string) *DescribeUserRequest {
 	return &DescribeUserRequest{
-		Id: id,
+		DescribeBy: DescribeBy_USER_ID,
+		UserId:     id,
+	}
+}
+
+func NewDescribeUserRequestByName(domain, name string) *DescribeUserRequest {
+	return &DescribeUserRequest{
+		DescribeBy: DescribeBy_USER_NAME,
+		Domain:     domain,
+		UserName:   name,
 	}
 }
 

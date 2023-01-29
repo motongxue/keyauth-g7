@@ -35,7 +35,7 @@ func (h *handler) QueryUser(r *restful.Request, w *restful.Response) {
 }
 
 func (h *handler) DescribeUser(r *restful.Request, w *restful.Response) {
-	req := user.NewDescribeUserRequest(r.PathParameter("id"))
+	req := user.NewDescribeUserRequestById(r.PathParameter("id"))
 	ins, err := h.service.DescribeUser(r.Request.Context(), req)
 	if err != nil {
 		response.Failed(w.ResponseWriter, err)

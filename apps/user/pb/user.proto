@@ -66,10 +66,28 @@ message UserSet {
     repeated User items = 2;
 }
 
+enum DescribeBy {
+    USER_ID = 0;
+    USER_NAME = 1;
+}
+
 message DescribeUserRequest {
-    // book id
-    // @gotags: json:"id"
-    string id = 1;
+    //    // book id
+    //    // @gotags: json:"id"
+    //    string id = 1;
+    
+    // describe_by
+    // @gotags: json:"describe_by"
+    DescribeBy describe_by = 1;
+    // user_id
+    // @gotags: json:"user_id"
+    string user_id = 2;
+    // domain
+    // @gotags: json:"domain"
+    string domain = 3;
+    // user_name
+    // @gotags: json:"user_name"
+    string user_name = 4;
 }
 
 message UpdateUserRequest {
