@@ -1,13 +1,18 @@
-package client
+package rpc
 
 import (
-	kc "github.com/infraboard/keyauth/client"
+	"fmt"
+	"github.com/infraboard/mcenter/client/rpc"
+
+	// kc "github.com/infraboard/keyauth/client"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/motongxue/keyauth-g7/apps/book"
+	"github.com/infraboard/mcenter/client/rpc/auth"
+	"github.com/infraboard/mcenter/client/rpc/resolver"
+	"github.com/motongxue/keyauth-g7/apps/token"
 )
 
 var (
@@ -24,15 +29,17 @@ func C() *ClientSet {
 	return client
 }
 
-// NewClient todo
-func NewClient(conf *kc.Config) (*ClientSet, error) {
+// 传递注册中心的地址
+func NewClient(conf *rpc.Config) (*ClientSet, error) {
 	zap.DevelopmentSetup()
 	log := zap.L()
 
 	conn, err := grpc.Dial(
-		conf.Address(),
+		// conf.Address(),
+		fmt.Sprintf("%s://%s", resolver.Scheme, "keyauth"), // Dial to "mcenter://keyauth"
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithPerRPCCredentials(conf.Authentication),
+		grpc.WithPerRPCCredentials(auth.NewAuthentication(conf.ClientID, conf.ClientSecret)),
+		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, err
@@ -51,6 +58,6 @@ type ClientSet struct {
 }
 
 // Book服务的SDK
-func (c *ClientSet) Book() book.ServiceClient {
-	return book.NewServiceClient(c.conn)
+func (c *ClientSet) Token() token.ServiceClient {
+	return token.NewServiceClient(c.conn)
 }

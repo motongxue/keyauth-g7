@@ -3,6 +3,7 @@ package conf
 import (
 	"context"
 	"fmt"
+	"github.com/infraboard/mcenter/client/rpc"
 	"sync"
 	"time"
 
@@ -19,7 +20,8 @@ func newConfig() *Config {
 		App: newDefaultAPP(),
 		Log: newDefaultLog(),
 
-		Mongo: newDefaultMongoDB(),
+		Mongo:   newDefaultMongoDB(),
+		Mcenter: rpc.NewDefaultConfig(),
 	}
 }
 
@@ -29,6 +31,28 @@ type Config struct {
 	Log *log `toml:"log"`
 
 	Mongo *mongodb `toml:"mongodb"`
+	// 注册中心的配置, 期望通过该配置能访问到注册中心
+	// 通过 mcenter 通过的SDK(GRPC SDK Client) 来访问
+	// 如何初始化 Mcenter GRPC Client ?
+	// 通过 SDK 提供的LoadClientFromConfig来初始化的
+	// 初始化后 mcenter 客户端包里面的全局变量 C来进行访问
+	// rpc.C().Instance()
+	// 后面 实现实例注册, 就执行使用 rpc.C() 这个全局对象
+	Mcenter *rpc.Config `toml:"mcenter"`
+}
+
+func (c *Config) InitGlobal() error {
+	// 加载全局配置实例
+	global = c
+	// 提前加载好mcenter客户端，全局变量
+	err := rpc.LoadClientFromConfig(c.Mcenter)
+	if err != nil {
+		return fmt.Errorf("load mcenter client from config error: " + err.Error())
+	}
+
+	// mcenter 客户端对象就初始化了
+	// rpc.C()
+	return nil
 }
 
 type app struct {

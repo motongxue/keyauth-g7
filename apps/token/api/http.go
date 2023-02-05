@@ -35,7 +35,7 @@ func (h *handler) Version() string {
 
 func (h *handler) Registry(ws *restful.WebService) {
 	tags := []string{h.Name()}
-
+	// 申请颁发token
 	ws.Route(ws.POST("/issue").To(h.IssueToken).
 		Doc("issue token").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
@@ -74,11 +74,14 @@ func (h *handler) Registry(ws *restful.WebService) {
 	// 	Doc("delete a user").
 	// 	Metadata(restfulspec.KeyOpenAPITags, tags).
 	// 	Param(ws.PathParameter("id", "identifier of the user").DataType("string")))
+
+	// 通过用户名和密码验证token的合法性
 	ws.Route(ws.GET("/validate").To(h.ValidateToken).
 		Doc("validate token").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata("action", "get"))
 
+	// 撤销token
 	ws.Route(ws.POST("/revolk").To(h.RevolkToken).
 		Doc("revolk token").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("integer").DefaultValue("1")).
