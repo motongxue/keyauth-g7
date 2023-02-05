@@ -61,7 +61,6 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Doc("delete a user").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")))
-	panic("implement me")
 }
 
 func (h *handler) Config() error {

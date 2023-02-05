@@ -24,7 +24,7 @@ service Service {
 
 message Token {
     // 唯一的ID
-    // @gotags: json: "access_token" bson: "_id"
+    // @gotags: json: "access_token" bson:"_id"
     string access_token = 1;
     // 颁发时间
     // @gotags: json:"issue_at" bson:"issue_at"

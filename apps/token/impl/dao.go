@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/motongxue/keyauth-g7/apps/token"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/infraboard/mcube/exception"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Save Object
@@ -25,7 +25,6 @@ func (s *impl) save(ctx context.Context, ins *token.Token) error {
 // 调用Decode方法来进行 反序列化  bytes ---> Object (通过BSON Tag)
 func (s *impl) get(ctx context.Context, accessToken string) (*token.Token, error) {
 	filter := bson.M{"_id": accessToken}
-
 	ins := token.NewDefaultToken()
 	if err := s.col.FindOne(ctx, filter).Decode(ins); err != nil {
 		if err == mongo.ErrNoDocuments {

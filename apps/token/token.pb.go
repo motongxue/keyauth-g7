@@ -86,8 +86,8 @@ type Token struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 唯一的ID
-	// @gotags: json: "access_token" bson: "_id"
-	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	// @gotags: json: "access_token" bson:"_id"
+	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty" bson:"_id"`
 	// 颁发时间
 	// @gotags: json:"issue_at" bson:"issue_at"
 	IssueAt int64 `protobuf:"varint,2,opt,name=issue_at,json=issueAt,proto3" json:"issue_at" bson:"issue_at"`
