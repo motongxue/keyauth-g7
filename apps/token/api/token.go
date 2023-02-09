@@ -2,10 +2,9 @@ package api
 
 import (
 	"github.com/emicklei/go-restful/v3"
-	"github.com/motongxue/keyauth-g7/apps/token"
-	"strings"
-
 	"github.com/infraboard/mcube/http/response"
+	"github.com/motongxue/keyauth-g7/apps/token"
+	"github.com/motongxue/keyauth-g7/common/utils"
 )
 
 func (h *handler) IssueToken(r *restful.Request, w *restful.Response) {
@@ -25,21 +24,7 @@ func (h *handler) IssueToken(r *restful.Request, w *restful.Response) {
 }
 
 func (h *handler) ValidateToken(r *restful.Request, w *restful.Response) {
-	// 我们Token哪里获取?
-	// 1. URL Query String ?
-	// 2. Custom Header ?
-	// 3. Authorization Header
-
-	accessToken := ""
-	auth := r.HeaderParameter("Authorization")
-	al := strings.Split(auth, " ")
-	if len(al) > 1 {
-		accessToken = al[1]
-	} else {
-		// 兼容 Authorization <token>
-		accessToken = auth
-	}
-
+	accessToken := utils.GetToken(r.Request)
 	req := token.NewValidateTokenRequest(accessToken)
 	ins, err := h.service.ValidateToken(r.Request.Context(), req)
 	if err != nil {

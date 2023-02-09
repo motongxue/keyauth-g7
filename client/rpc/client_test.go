@@ -24,10 +24,10 @@ func TestBookQuery(t *testing.T) {
 	conf.ClientID = os.Getenv("MCENTER_CDMB_CLIENT_ID")
 	conf.ClientSecret = os.Getenv("MCENTER_CMDB_CLIENT_SECRET")
 	t.Log(conf)
-	// 传递Mcenter配置, 客户端通过Mcenter进行搜索
-	c, err := rpc.NewClient(conf)
+	// 传递Mcenter配置, 客户端通过Mcenter进行搜索, New一个用户中心的客户端
+	keyauthClient, err := rpc.NewClient(conf)
 	if should.NoError(err) {
-		resp, err := c.Token().ValidateToken(
+		resp, err := keyauthClient.Token().ValidateToken(
 			context.Background(),
 			token.NewValidateTokenRequest("ICjMbuzXJi12Xel7qKxAh9WJ"),
 		)

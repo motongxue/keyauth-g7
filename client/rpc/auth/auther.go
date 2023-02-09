@@ -11,6 +11,7 @@ func NewKeyauthAuther(auth token.ServiceClient) *KeyauthAuther {
 	}
 }
 
+// 有Keyauth提供的 HTTP认证中间件
 type KeyauthAuther struct {
 	log  logger.Logger
 	auth token.ServiceClient
