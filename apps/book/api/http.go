@@ -37,7 +37,7 @@ func (h *handler) Version() string {
 func (h *handler) Registry(ws *restful.WebService) {
 	tags := []string{"books"}
 
-	ws.Route(ws.POST("").To(h.CreateBook).
+	ws.Route(ws.POST("/").To(h.CreateBook).
 		Doc("create a book").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(book.CreateBookRequest{}).
