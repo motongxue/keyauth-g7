@@ -46,4 +46,6 @@ func (s *service) Registry(server *grpc.Server) {
 
 func init() {
 	app.RegistryGrpcApp(svr)
+	// 将扩展接口后的实例注册到内部类中，不暴露到RPC服务接口中
+	app.RegistryInternalApp(svr)
 }
