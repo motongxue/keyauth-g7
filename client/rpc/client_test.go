@@ -26,6 +26,10 @@ func TestBookQuery(t *testing.T) {
 	t.Log(conf)
 	// 传递Mcenter配置, 客户端通过Mcenter进行搜索, New一个用户中心的客户端
 	keyauthClient, err := rpc.NewClient(conf)
+
+	// 进行服务功能注册
+	// keyauthClient.Endpoint().RegistryEndpoint()
+
 	if should.NoError(err) {
 		resp, err := keyauthClient.Token().ValidateToken(
 			context.Background(),

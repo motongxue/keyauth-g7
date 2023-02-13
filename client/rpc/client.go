@@ -3,6 +3,7 @@ package rpc
 import (
 	"fmt"
 	"github.com/infraboard/mcenter/client/rpc"
+	"github.com/motongxue/keyauth-g7/apps/endpoint"
 
 	// kc "github.com/infraboard/keyauth/client"
 	"github.com/infraboard/mcube/logger"
@@ -57,7 +58,12 @@ type ClientSet struct {
 	log  logger.Logger
 }
 
-// Book服务的SDK
+// Token服务的SDK
 func (c *ClientSet) Token() token.ServiceClient {
 	return token.NewServiceClient(c.conn)
+}
+
+// Endpoint服务的SDK
+func (c *ClientSet) Endpoint() endpoint.RPCClient {
+	return endpoint.NewRPCClient(c.conn)
 }
