@@ -96,9 +96,9 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 	if authV, ok := meta[label.Audit]; ok {
 		switch v := authV.(type) {
 		case bool:
-			isAuthEnable = v
+			isAuditEnable = v
 		case string:
-			isAuthEnable = v == "true"
+			isAuditEnable = v == "true"
 		}
 	}
 	start := time.Now()
@@ -129,7 +129,7 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 				auditReq.Action, _ = v.(string)
 			}
 		}
-
+		a.log.Debug("audit request %s", auditReq)
 		_, err := a.audit.AuditOperate(req.Request.Context(), auditReq)
 		if err != nil {
 			a.log.Warnf("audit operate failed, %s", err)
