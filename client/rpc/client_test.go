@@ -59,7 +59,8 @@ func TestValidatePermission(t *testing.T) {
 		req.Resource = "secret"
 		// req.Action = "delete" Mongdb中，没有对应的delete操作，故执行应该失败
 		req.Action = "list"
-		// TODO 查明为什么会出现no permission？因为policy中是通过policy表中的spec.role(而非spec.username)该字符串作为标识去role表中查找对应的spec.name标识
+		// TODO 查明为什么会出现no permission？
+		//  因为policy中是通过policy表中的spec.role(而非spec.username)该字符串作为标识去role表中查找对应的spec.name标识
 		p, err := keyauthClient.Policy().ValidatePermission(context.TODO(), req)
 		if err != nil {
 			t.Fatal(err)
