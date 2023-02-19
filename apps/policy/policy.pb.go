@@ -188,13 +188,13 @@ type CreatePolicyRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// 操作行为
+	// 用户名
 	// @gotags: json:"username" bson:"username" validate:"required"
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username" bson:"username" validate:"required"`
-	// 操作行为
+	// 角色名称
 	// @gotags: json:"role" bson:"role" validate:"required"
 	Role string `protobuf:"bytes,2,opt,name=role,proto3" json:"role" bson:"role" validate:"required"`
-	// 操作行为
+	// 空间
 	// @gotags: json:"namespace" bson:"namespace"
 	Namespace string `protobuf:"bytes,3,opt,name=namespace,proto3" json:"namespace" bson:"namespace"`
 }

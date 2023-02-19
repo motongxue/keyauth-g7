@@ -25,6 +25,7 @@ func (s *service) ValidatePermission(ctx context.Context, req *policy.ValidatePe
 	// 从集合中获取用户的角色名
 	roleNames := set.Roles()
 
+	s.log.Debugf("found roles: %s", roleNames)
 	// 通过角色名获取查询角色列表的请求
 	queryRoleReq := role.NewQueryRoleRequestWithName(roleNames)
 	queryRoleReq.Page.PageSize = 100

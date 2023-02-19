@@ -60,6 +60,9 @@ message Permission {
     // 服务名称
     // @gotags: json:"service" bson:"service"
     string service = 1;
+    // 是否允许访问所有功能
+    // @gotags: json:"allow_all" bson:"allow_all
+    bool allow_all = 3;
     // 服务功能
     // @gotags: json:"features" bson:"features"
     repeated Feature features = 2;

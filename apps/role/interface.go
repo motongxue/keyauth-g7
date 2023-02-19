@@ -79,6 +79,11 @@ func (p *Permission) HasPermission(req *PermissionRequest) bool {
 	if p.Service != req.Service {
 		return false
 	}
+	// 放行所有功能
+	if p.AllowAll {
+		return true
+	}
+	// 查询所有的功能,确认是否允许
 	for i := range p.Features {
 		if p.Features[i].Action == req.Action &&
 			p.Features[i].Resource == req.Resource {
