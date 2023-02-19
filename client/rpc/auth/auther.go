@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
+	"github.com/motongxue/keyauth-g7/apps/audit"
 	"github.com/motongxue/keyauth-g7/apps/policy"
 	"github.com/motongxue/keyauth-g7/apps/token"
 	"github.com/motongxue/keyauth-g7/client/rpc"
@@ -13,6 +14,7 @@ func NewKeyauthAuther(client *rpc.ClientSet, serviceName string) *KeyauthAuther 
 		log:         zap.L().Named("http.auther"),
 		auth:        client.Token(),
 		perm:        client.Policy(),
+		audit:       client.Audit(),
 		serviceName: serviceName,
 	}
 }
@@ -22,5 +24,6 @@ type KeyauthAuther struct {
 	log         logger.Logger
 	auth        token.ServiceClient
 	perm        policy.RPCClient
+	audit       audit.RPCClient
 	serviceName string
 }

@@ -4,10 +4,13 @@ import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/exception"
 	"github.com/infraboard/mcube/http/label"
+	"github.com/infraboard/mcube/http/request"
 	"github.com/infraboard/mcube/http/response"
+	"github.com/motongxue/keyauth-g7/apps/audit"
 	"github.com/motongxue/keyauth-g7/apps/policy"
 	"github.com/motongxue/keyauth-g7/apps/token"
 	"github.com/motongxue/keyauth-g7/common/utils"
+	"time"
 )
 
 // Go-Restful auth Middleware
@@ -68,8 +71,11 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 	}
 	// 认证后，才能鉴权
 	if isAuthEnable && isPermEnable {
+		tk := req.Attribute("token").(*token.Token)
 		permReq := policy.NewValidatePermissionRequest()
 		permReq.Service = a.serviceName
+		permReq.Username = tk.Data.UserName
+
 		if meta != nil {
 			if v, ok := meta[label.Resource]; ok {
 				permReq.Resource, _ = v.(string)
@@ -84,6 +90,50 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 			return
 		}
 	}
+
+	// 获取meta信息, get, 判断是否开启鉴权
+	var isAuditEnable bool
+	if authV, ok := meta[label.Audit]; ok {
+		switch v := authV.(type) {
+		case bool:
+			isAuthEnable = v
+		case string:
+			isAuthEnable = v == "true"
+		}
+	}
+	start := time.Now()
+
 	// chain 用于将请求flow下去
 	chain.ProcessFilter(req, resp)
+
+	cost := time.Now().Sub(start).Milliseconds()
+
+	// 如果有记录Respone需求的话，需要在Process才有进行的
+	// 认证后，才能审计
+	if isAuthEnable && isAuditEnable {
+		tk := req.Attribute("token").(*token.Token)
+		auditReq := audit.NewOperateLog(tk.Data.UserName, "", "")
+		auditReq.Service = a.serviceName
+		auditReq.Url = req.Request.URL.String()
+		auditReq.Cost = cost
+		auditReq.StatusCode = int64(resp.StatusCode())
+		auditReq.UserAgent = req.Request.UserAgent()
+		// 采用封装好的库实现用户ip的获取，先判断是否使用代理，没有代理则直接RemoteAddr
+		auditReq.RemoteIp = request.GetRemoteIP(req.Request)
+
+		if meta != nil {
+			if v, ok := meta[label.Resource]; ok {
+				auditReq.Resource, _ = v.(string)
+			}
+			if v, ok := meta[label.Action]; ok {
+				auditReq.Action, _ = v.(string)
+			}
+		}
+
+		_, err := a.audit.AuditOperate(req.Request.Context(), auditReq)
+		if err != nil {
+			a.log.Warnf("audit operate failed, %s", err)
+			return
+		}
+	}
 }
