@@ -3,6 +3,7 @@ package rpc
 import (
 	"fmt"
 	"github.com/infraboard/mcenter/client/rpc"
+	"github.com/motongxue/keyauth-g7/apps/audit"
 	"github.com/motongxue/keyauth-g7/apps/endpoint"
 	"github.com/motongxue/keyauth-g7/apps/policy"
 	"github.com/motongxue/keyauth-g7/apps/role"
@@ -78,4 +79,9 @@ func (c *ClientSet) Role() role.RPCClient {
 // Policy服务的SDK
 func (c *ClientSet) Policy() policy.RPCClient {
 	return policy.NewRPCClient(c.conn)
+}
+
+// Audit服务的SDK
+func (c *ClientSet) Audit() audit.RPCClient {
+	return audit.NewRPCClient(c.conn)
 }

@@ -1,6 +1,7 @@
 package all
 
 import (
+	_ "github.com/motongxue/keyauth-g7/apps/audit/impl"
 	_ "github.com/motongxue/keyauth-g7/apps/endpoint/impl"
 	_ "github.com/motongxue/keyauth-g7/apps/policy/impl"
 	_ "github.com/motongxue/keyauth-g7/apps/role/impl"

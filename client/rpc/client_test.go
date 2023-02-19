@@ -3,6 +3,7 @@ package rpc_test
 import (
 	"context"
 	"fmt"
+	"github.com/motongxue/keyauth-g7/apps/audit"
 	"github.com/motongxue/keyauth-g7/apps/policy"
 	"github.com/motongxue/keyauth-g7/apps/token"
 	"github.com/motongxue/keyauth-g7/client/rpc"
@@ -69,6 +70,26 @@ func TestValidatePermission(t *testing.T) {
 	}
 }
 
+// 审计测试
+func TestAuditPermission(t *testing.T) {
+	should := assert.New(t)
+
+	conf := mcenter.NewDefaultConfig()
+	conf.Address = os.Getenv("MCENTER_ADDRESS")
+	conf.ClientID = os.Getenv("MCENTER_CDMB_CLINET_ID")
+	conf.ClientSecret = os.Getenv("MCENTER_CMDB_CLIENT_SECRET")
+
+	// 传递Mcenter配置, 客户端通过Mcenter进行搜索, New一个用户中心的客户端
+	keyauthClient, err := rpc.NewClient(conf)
+	if should.NoError(err) {
+		req := audit.NewOperateLog("member", "secret", "delete")
+		p, err := keyauthClient.Audit().AuditOperate(context.TODO(), req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(p)
+	}
+}
 func init() {
 	// 提前加载好 mcenter客户端, resolver需要使用
 	err := mcenter.LoadClientFromEnv()

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package keyauth_g7.audit;
+option go_package = "github.com/motongxue/keyauth-g7/apps/audit";
+
+//通过RPC来鉴权
+service RPC {
+    rpc AuditOperate(OperateLog) returns(AuditOperateLogResponse);
+}
+
+// 操作日志
+message OperateLog {
+    // 谁
+    // @gotags: json:"username" bson:"username"
+    string username = 1;
+    // 什么时候
+    // @gotags: json:"when" bson:"when"
+    int64 when = 2;
+    // 对哪种资源
+    // @gotags: json:"resource" bson:"resource"
+    string resource = 3;
+    // 对哪种资源
+    // @gotags: json:"action" bson:"action"
+    string action = 4;
+    // 请求参数
+    // @gotags: json:"request" bson:"request"
+    string request = 5;
+    // 请求响应
+    // @gotags: json:"response" bson:"response"
+    string response = 6;
+    // 其他信息
+    // @gotags: json:"meta" bson:"meta"
+    map<string,string> meta = 7;
+}
+
+message AuditOperateLogResponse {
+
+}
