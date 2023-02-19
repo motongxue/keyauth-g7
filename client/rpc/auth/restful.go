@@ -53,8 +53,6 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 		// 3. 处理完成后，需要直接中断返回
 		// req.SetAttribute("token", tk)
 		req.SetAttribute("token", tk)
-		// 4. chain用于将请求flow下去
-		chain.ProcessFilter(req, resp)
 	}
 
 	// 鉴权逻辑
@@ -85,7 +83,7 @@ func (a *KeyauthAuther) RestfulAuthHandlerFunc(
 			response.Failed(resp.ResponseWriter, exception.NewPermissionDeny(err.Error()))
 			return
 		}
-		chain.ProcessFilter(req, resp)
 	}
-
+	// chain 用于将请求flow下去
+	chain.ProcessFilter(req, resp)
 }
