@@ -1,0 +1,19 @@
+{
+  "name": "member",
+  "description": "成员",
+  "permissions": [
+    {
+      "service": "cmdb",
+      "features": [
+        {
+          "resource": "secret",
+          "action": "list"
+        },
+        {
+          "resource": "secret",
+          "action": "get"
+        }
+      ]
+    }
+  ]
+}

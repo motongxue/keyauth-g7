@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/infraboard/mcenter/client/rpc"
 	"github.com/motongxue/keyauth-g7/apps/endpoint"
+	"github.com/motongxue/keyauth-g7/apps/policy"
+	"github.com/motongxue/keyauth-g7/apps/role"
 
 	// kc "github.com/infraboard/keyauth/client"
 	"github.com/infraboard/mcube/logger"
@@ -66,4 +68,14 @@ func (c *ClientSet) Token() token.ServiceClient {
 // Endpoint服务的SDK
 func (c *ClientSet) Endpoint() endpoint.RPCClient {
 	return endpoint.NewRPCClient(c.conn)
+}
+
+// Role服务的SDK
+func (c *ClientSet) Role() role.RPCClient {
+	return role.NewRPCClient(c.conn)
+}
+
+// Policy服务的SDK
+func (c *ClientSet) Policy() policy.RPCClient {
+	return policy.NewRPCClient(c.conn)
 }
