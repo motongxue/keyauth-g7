@@ -33,7 +33,7 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Doc("get all users").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata("action", "list").
-		Reads(user.CreateUserRequest{}).
+		Reads(user.QueryUserRequest{}).
 		Writes(response.NewData(user.UserSet{})).
 		Returns(200, "OK", user.UserSet{}))
 

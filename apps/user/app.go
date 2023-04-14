@@ -44,7 +44,8 @@ func NewUserSet() *UserSet {
 		Items: []*User{},
 	}
 }
-func (s UserSet) Add(item *User) {
+// 原先是 s UserSet 改成了 -> s *UserSet，是否因为这个存在bug
+func (s *UserSet) Add(item *User) {
 	s.Items = append(s.Items, item)
 }
 func NewCreateUserRequest() *CreateUserRequest {
