@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+
 	"github.com/infraboard/mcube/exception"
 	"github.com/motongxue/keyauth-g7/apps/user"
 	"go.mongodb.org/mongo-driver/bson"
@@ -51,7 +52,7 @@ func (r *queryRequest) FindOptions() *options.FindOptions {
 func (i *impl) query(ctx context.Context, req *queryRequest) (*user.UserSet, error) {
 	resp, err := i.col.Find(ctx, req.FindFilter(), req.FindOptions())
 	if err != nil {
-		return nil, exception.NewInternalServerError("find book error, error is %s", err)
+		return nil, exception.NewInternalServerError("find user error, error is %s", err)
 	}
 	userSet := user.NewUserSet()
 
@@ -60,14 +61,14 @@ func (i *impl) query(ctx context.Context, req *queryRequest) (*user.UserSet, err
 		// resp是Cursor对象，
 		// Decode will unmarshal the current document into val
 		if err := resp.Decode(ins); err != nil {
-			return nil, exception.NewInternalServerError("decode book error, error is %s", err)
+			return nil, exception.NewInternalServerError("decode user error, error is %s", err)
 		}
 		userSet.Add(ins)
 	}
 	// count
 	count, err := i.col.CountDocuments(ctx, req.FindFilter())
 	if err != nil {
-		return nil, exception.NewInternalServerError("get book count error, error is %s", err)
+		return nil, exception.NewInternalServerError("get user count error, error is %s", err)
 	}
 	userSet.Total = count
 
@@ -98,4 +99,33 @@ func (i *impl) get(ctx context.Context, req *user.DescribeUserRequest) (*user.Us
 	}
 
 	return ins, nil
+}
+
+// UpdateByID, 通过主键来更新对象
+func (i *impl) update(ctx context.Context, ins *user.User) error {
+	// SQL update obj(SET f=v,f=v) where id=?
+	// s.col.UpdateOne(ctx, filter(), ins)
+	// TODO　更新时会提示document must contain key beginning with '$'，尚未解决
+	if _, err := i.col.UpdateByID(ctx, ins.Id, ins); err != nil {
+		return exception.NewInternalServerError("inserted user(%s) document error, %s",
+			ins.Data.Name, err)
+	}
+	return nil
+}
+
+func (i *impl) deleteUser(ctx context.Context, ins *user.User) error {
+	if ins == nil || ins.Id == "" {
+		return fmt.Errorf("user is nil")
+	}
+
+	result, err := i.col.DeleteOne(ctx, bson.M{"_id": ins.Id})
+	if err != nil {
+		return exception.NewInternalServerError("delete user(%s) error, %s", ins.Id, err)
+	}
+
+	if result.DeletedCount == 0 {
+		return exception.NewNotFound("user %s not found", ins.Id)
+	}
+
+	return nil
 }

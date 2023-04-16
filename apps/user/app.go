@@ -1,13 +1,15 @@
 package user
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/go-playground/validator/v10"
+	"github.com/imdario/mergo"
 	"github.com/infraboard/mcube/http/request"
 	pb_request "github.com/infraboard/mcube/pb/request"
 	"github.com/motongxue/keyauth-g7/common/utils"
 	"github.com/rs/xid"
-	"net/http"
-	"time"
 )
 
 const (
@@ -44,6 +46,7 @@ func NewUserSet() *UserSet {
 		Items: []*User{},
 	}
 }
+
 // 原先是 s UserSet 改成了 -> s *UserSet，是否因为这个存在bug
 func (s *UserSet) Add(item *User) {
 	s.Items = append(s.Items, item)
@@ -98,4 +101,16 @@ func NewDeleteUserRequestWithID(id string) *DeleteUserRequest {
 	return &DeleteUserRequest{
 		Id: id,
 	}
+}
+
+func (i *User) Update(req *UpdateUserRequest) {
+	i.UpdateAt = time.Now().UnixMicro()
+	i.UpdateBy = req.UpdateBy
+	i.Data = req.Data
+}
+
+func (i *User) Patch(req *UpdateUserRequest) error {
+	i.UpdateAt = time.Now().UnixMicro()
+	i.UpdateBy = req.UpdateBy
+	return mergo.MergeWithOverwrite(i.Data, req.Data)
 }

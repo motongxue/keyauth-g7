@@ -2,11 +2,11 @@ package impl
 
 import (
 	"context"
+
 	"github.com/infraboard/mcube/exception"
+	"github.com/infraboard/mcube/pb/request"
 	"github.com/motongxue/keyauth-g7/apps/user"
 	"github.com/motongxue/keyauth-g7/common/utils"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func (i *impl) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.User, error) {
@@ -31,8 +31,43 @@ func (i *impl) DescribeUser(ctx context.Context, req *user.DescribeUserRequest) 
 	return i.get(ctx, req)
 }
 func (i *impl) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+	ins, err := i.DescribeUser(ctx, user.NewDescribeUserRequestById(req.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	switch req.UpdateMode {
+	case request.UpdateMode_PUT:
+		ins.Update(req)
+	case request.UpdateMode_PATCH:
+		err := ins.Patch(req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// 校验更新后数据合法性
+	if err := ins.Data.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := i.update(ctx, ins); err != nil {
+		return nil, err
+	}
+
+	return ins, nil
+
 }
 func (i *impl) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (*user.User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+	ins, err := i.DescribeUser(ctx, user.NewDescribeUserRequestById(req.Id))
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := i.deleteUser(ctx, ins); err != nil {
+		return nil, err
+	}
+
+	return ins, nil
 }

@@ -49,13 +49,13 @@ func (h *handler) Registry(ws *restful.WebService) {
 		Doc("update a user").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads(user.CreateUserRequest{}))
+		Reads(user.UpdateUserRequest{}))
 
 	ws.Route(ws.PATCH("/{id}").To(h.PatchUser).
 		Doc("patch a user").
 		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads(user.CreateUserRequest{}))
+		Reads(user.UpdateUserRequest{}))
 
 	ws.Route(ws.DELETE("/{id}").To(h.DeleteUser).
 		Doc("delete a user").
