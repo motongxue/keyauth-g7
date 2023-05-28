@@ -103,10 +103,10 @@ func (i *impl) get(ctx context.Context, req *user.DescribeUserRequest) (*user.Us
 
 // UpdateByID, 通过主键来更新对象
 func (i *impl) update(ctx context.Context, ins *user.User) error {
-	// SQL update obj(SET f=v,f=v) where id=?
-	// s.col.UpdateOne(ctx, filter(), ins)
-	// TODO　更新时会提示document must contain key beginning with '$'，尚未解决
-	if _, err := i.col.UpdateByID(ctx, ins.Id, ins); err != nil {
+	updateDoc := bson.D{
+		{Key: "$set", Value: ins},
+	}
+	if _, err := i.col.UpdateByID(ctx, ins.Id, updateDoc); err != nil {
 		return exception.NewInternalServerError("inserted user(%s) document error, %s",
 			ins.Data.Name, err)
 	}

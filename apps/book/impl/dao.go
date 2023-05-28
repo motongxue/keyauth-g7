@@ -114,9 +114,10 @@ func (s *service) query(ctx context.Context, req *queryBookRequest) (*book.BookS
 
 // UpdateByID, 通过主键来更新对象
 func (s *service) update(ctx context.Context, ins *book.Book) error {
-	// SQL update obj(SET f=v,f=v) where id=?
-	// s.col.UpdateOne(ctx, filter(), ins)
-	if _, err := s.col.UpdateByID(ctx, ins.Id, ins); err != nil {
+	updateDoc := bson.D{
+		{Key: "$set", Value: ins},
+	}
+	if _, err := s.col.UpdateByID(ctx, ins.Id, updateDoc); err != nil {
 		return exception.NewInternalServerError("inserted book(%s) document error, %s",
 			ins.Data.Name, err)
 	}

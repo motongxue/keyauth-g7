@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+
 	"github.com/motongxue/keyauth-g7/apps/token"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -57,9 +58,10 @@ func (s *impl) delete(ctx context.Context, ins *token.Token) error {
 
 // UpdateByID, 通过主键来更新对象
 func (s *impl) update(ctx context.Context, ins *token.Token) error {
-	// SQL update obj(SET f=v,f=v) where id=?
-	// s.col.UpdateOne(ctx, filter(), ins)
-	if _, err := s.col.UpdateByID(ctx, ins.AccessToken, ins); err != nil {
+	updateDoc := bson.D{
+		{Key: "$set", Value: ins},
+	}
+	if _, err := s.col.UpdateByID(ctx, ins.AccessToken, updateDoc); err != nil {
 		return exception.NewInternalServerError("update token(%s) document error, %s",
 			ins.AccessToken, err)
 	}
