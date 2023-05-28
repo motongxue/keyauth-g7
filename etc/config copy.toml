@@ -1,0 +1,34 @@
+[app]
+name = "keyauth"
+key  = "this is your app key"
+
+[app.http]
+host = "127.0.0.1"
+port = "8050"
+
+[app.grpc]
+host = "127.0.0.1"
+port = "18050"
+
+# 配置mongodb
+# 切换到test库，如果没有则（创建集合时）会自动创建
+# use keyauth;
+# 创建用户
+# db.createUser({user: "keyauth",pwd: "keyauth", roles: [{role: "dbAdmin", db: "keyauth"}]});
+[mongodb]
+endpoints = ["127.0.0.1:27017"]
+username = "keyauth"
+password = "keyauth"
+database = "keyauth"
+
+[log]
+level = "debug"
+path_dir = "logs"
+format = "text"
+to = "stdout"
+
+# 去mcenter中查看keyauth的client_id和client_secret
+[mcenter]
+address = "127.0.0.1:18010"
+client_id = "6sHOFwUi1hTFMUbQlERiI061"
+client_secret = "YHtPQaTsnhf840V3Kq5Z4dwZ1ORD1l1r"
